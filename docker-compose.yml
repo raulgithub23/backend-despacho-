@@ -11,7 +11,7 @@ services:
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - mysql_data:/var/lib/mysql # Named volume
+      - mysql_data:/var/lib/mysql
     networks:
       - backend-net
     healthcheck:
@@ -32,6 +32,24 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend-net
+
+  ventas:
+    image: ${VENTAS_IMAGE:-backend-ventas:latest}
+    container_name: ventas-api
+    restart: unless-stopped
+    environment:
+      DB_ENDPOINT: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8082:8082"
     depends_on:
       db:
         condition: service_healthy
